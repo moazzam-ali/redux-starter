@@ -1,13 +1,18 @@
-import data from "../../data";
+import { useSelector } from "react-redux";
 
-const { fruits } = data;
+// const { fruits } = data;
 import ItemCard from "../../components/ItemCard/ItemCard";
 
-const fruitsList = fruits.map((fruit) => {
-    return <ItemCard key={fruit.id} data={fruit} />;
-});
-
 function Fruits() {
+    // fetching fruits data from the state
+    const { fruits } = useSelector((state) => {
+        return state.items;
+    });
+
+    // list of fruits generation
+    const fruitsList = fruits.map((fruit) => {
+        return <ItemCard key={fruit.id} data={fruit} />;
+    });
     return (
         <div className="fruits padding">
             <div className="fruits-hero">

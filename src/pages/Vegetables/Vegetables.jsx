@@ -1,14 +1,17 @@
-import data from "../../data";
-
-const { vegetables } = data;
+import { useSelector } from "react-redux";
 
 import ItemCard from "../../components/ItemCard/ItemCard";
 
-const vegetablesList = vegetables.map((vegetable) => {
-    return <ItemCard key={vegetable.id} data={vegetable} />;
-});
-
 function Vegetables() {
+    // fetching fruits data from the state
+    const { vegetables } = useSelector((state) => {
+        return state.items;
+    });
+
+    // geneation of vegetables list
+    const vegetablesList = vegetables.map((vegetable) => {
+        return <ItemCard key={vegetable.id} data={vegetable} />;
+    });
     return (
         <div className="vegetables padding">
             <div className="vegetables-hero">

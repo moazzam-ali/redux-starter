@@ -1,37 +1,26 @@
 import { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 
+import { Link } from "react-router-dom";
+
+// cart reducers
 import {
     itemIncrement,
     itemDecrement,
     itemRemoved,
+    checkout,
 } from "../../features/cart/cartSlice";
+
+// items reduces
+import {
+    itemAddedToCart,
+    itemRemovedFromCart,
+} from "../../features/items/itemsSlice";
 
 // react-icons
 import { Drawer } from "antd";
 import { TbTruckDelivery } from "react-icons/tb";
 import { BiCartAlt } from "react-icons/bi";
-
-// data file
-import data from "../../data";
-
-// getting cart item details
-const getItemDetails = (cartItem) => {
-    const { type, id, quantity } = cartItem;
-
-    let itemDetails = null;
-
-    if (type === "vegetable") {
-        itemDetails = data.vegetables.find((vegetable) => vegetable.id === id);
-        itemDetails = { ...itemDetails, quantity: quantity };
-    } else if (type === "fruit") {
-        itemDetails = data.fruits.find((fruit) => fruit.id === id);
-        itemDetails = { ...itemDetails, quantity: quantity };
-    }
-    console.log(itemDetails);
-
-    return itemDetails;
-};
 
 function Navbar() {
     const [open, setOpen] = useState(false);
@@ -41,6 +30,27 @@ function Navbar() {
     const { cartItems, totalPrice, totalQuantity } = useSelector(
         (state) => state.cart
     );
+
+    const data = useSelector((state) => state.items);
+
+    // getting cart item details
+    const getItemDetails = (cartItem) => {
+        const { type, id, quantity } = cartItem;
+
+        let itemDetails = null;
+
+        if (type === "vegetable") {
+            itemDetails = data.vegetables.find(
+                (vegetable) => vegetable.id === id
+            );
+            itemDetails = { ...itemDetails, quantity: quantity };
+        } else if (type === "fruit") {
+            itemDetails = data.fruits.find((fruit) => fruit.id === id);
+            itemDetails = { ...itemDetails, quantity: quantity };
+        }
+
+        return itemDetails;
+    };
 
     const itemDetailsArray = cartItems.map((cartItem) =>
         getItemDetails(cartItem)
@@ -55,6 +65,14 @@ function Navbar() {
                 type: type,
             })
         );
+
+        dispatch(
+            itemAddedToCart({
+                id: id,
+                type: type,
+                quantity: 1,
+            })
+        );
     };
 
     const onItemDecrementClicked = (id, name, type) => {
@@ -65,9 +83,17 @@ function Navbar() {
                 type: type,
             })
         );
+
+        dispatch(
+            itemRemovedFromCart({
+                id: id,
+                type: type,
+                quantity: 1,
+            })
+        );
     };
 
-    const onItemDeletetClicked = (id, name, type) => {
+    const onItemDeletetClicked = (id, name, type, quantity) => {
         dispatch(
             itemRemoved({
                 id: id,
@@ -75,6 +101,18 @@ function Navbar() {
                 type: type,
             })
         );
+
+        dispatch(
+            itemRemovedFromCart({
+                id: id,
+                type: type,
+                quantity: quantity,
+            })
+        );
+    };
+
+    const handleCheckout = () => {
+        dispatch(checkout());
     };
 
     const cartItemsList = itemDetailsArray.map((item) => {
@@ -105,7 +143,12 @@ function Navbar() {
                 <p
                     className="delete-btn"
                     onClick={() => {
-                        onItemDeletetClicked(item.id, item.name, item.type);
+                        onItemDeletetClicked(
+                            item.id,
+                            item.name,
+                            item.type,
+                            item.quantity
+                        );
                     }}
                 >
                     DEL
@@ -126,22 +169,22 @@ function Navbar() {
     return (
         <div className="navbar padding">
             <div className="navbar-brand">
-                <a className="navbrand" href="/">
-                    Fruits/Vegetables Shop
-                </a>
+                <Link className="navbrand" to="/">
+                    Fruits/Vegetales Shop
+                </Link>
             </div>
 
             <div className="navbar-links">
-                <a href="#" className="navbar-link">
+                <Link className="navbar-link" onClick={handleCheckout}>
                     <TbTruckDelivery className="nav-link-icon" />
-                </a>
-                <a href="/fruits" className="navbar-link">
-                    Fruits
-                </a>
-                <a href="/vegetables" className="navbar-link">
+                </Link>
+                <Link to="/fruits" className="navbar-link">
+                    Fruits{" "}
+                </Link>
+                <Link to="/vegetables" className="navbar-link">
                     Vegetables
-                </a>
-                <p href="" className="navbar-link" onClick={showDrawer}>
+                </Link>
+                <p className="navbar-link" onClick={showDrawer}>
                     <BiCartAlt className="nav-link-icon" />
                 </p>
             </div>
@@ -169,6 +212,9 @@ function Navbar() {
                         Total Quanity : {totalQuantity}{" "}
                     </div>
                     <div className="cart-price">Total Price : {totalPrice}</div>
+                    <button className="check-btn" onClick={handleCheckout}>
+                        Checkout
+                    </button>
                 </div>
             </Drawer>
         </div>

@@ -1,6 +1,8 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { message } from "antd";
 
+import { useDispatch } from "react-redux";
+
 export const cartSlice = createSlice({
     name: "cart",
     initialState: {
@@ -8,6 +10,7 @@ export const cartSlice = createSlice({
         totalQuantity: 0,
         totalPrice: 0,
     },
+
     reducers: {
         itemAdded(state, action) {
             const newItem = action.payload;
@@ -72,10 +75,22 @@ export const cartSlice = createSlice({
                 message.success(`${removedItem.name} removed from Cart!`);
             }
         },
+
+        checkout(state, action) {
+            state.cartItems = [];
+            state.totalQuantity = 0;
+            state.totalPrice = 0;
+            message.success("Checkout successful! Cart cleared.");
+        },
     },
 });
 
-export const { itemAdded, itemIncrement, itemDecrement, itemRemoved } =
-    cartSlice.actions;
+export const {
+    itemAdded,
+    itemIncrement,
+    itemDecrement,
+    itemRemoved,
+    checkout,
+} = cartSlice.actions;
 
 export default cartSlice.reducer;

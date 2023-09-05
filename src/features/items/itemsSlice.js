@@ -7,9 +7,31 @@ const initialState = data;
 export const itemsSlice = createSlice({
     name: "items",
     initialState,
-    reducers: {},
+    reducers: {
+        itemAddedToCart(state, action) {
+            const { id, type, quantity } = action.payload;
+            const itemToUpdate = state[type + "s"].find(
+                (item) => item.id === id
+            );
+
+            if (itemToUpdate) {
+                itemToUpdate.availability -= quantity;
+            }
+        },
+
+        itemRemovedFromCart(state, action) {
+            const { id, type, quantity } = action.payload;
+            const itemToUpdate = state[type + "s"].find(
+                (item) => item.id === id
+            );
+
+            if (itemToUpdate) {
+                itemToUpdate.availability += quantity;
+            }
+        },
+    },
 });
 
-// export const {} = itemsSlice.actions;
+export const { itemAddedToCart, itemRemovedFromCart } = itemsSlice.actions;
 
 export default itemsSlice.reducer;

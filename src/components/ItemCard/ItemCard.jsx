@@ -1,7 +1,12 @@
 // dispatch actions
 import { useDispatch } from "react-redux";
 
+// cartslice reducers
 import { itemAdded } from "../../features/cart/cartSlice";
+
+// itemslice reducers
+import { itemAddedToCart } from "../../features/items/itemsSlice";
+import { message } from "antd";
 
 function ItemCard(props) {
     const dispatch = useDispatch();
@@ -16,6 +21,15 @@ function ItemCard(props) {
                 price: props.data.specialPrice
                     ? props.data.specialPrice
                     : props.data.price,
+            })
+        );
+
+        // Dispatch action to update availability
+        dispatch(
+            itemAddedToCart({
+                id: props.data.id,
+                type: props.data.type,
+                quantity: 1,
             })
         );
     };
@@ -44,15 +58,30 @@ function ItemCard(props) {
                 </p>
                 <p className="item-amount">Amount: {props.data.amount}</p>
                 <p className="item-availability">
-                    Availablity: {props.data.availability}
+                    Availablity:{" "}
+                    {props.data.availability > 0
+                        ? props.data.availability
+                        : "Not Available"}
                 </p>
                 <p className="item-validity">
                     Valid Till: {props.data.validity}
                 </p>
             </div>
-            <button className="card-button" onClick={onAddItemClicked}>
-                ADD TO CART
-            </button>
+
+            {props.data.availability > 0 ? (
+                <button className="card-button" onClick={onAddItemClicked}>
+                    ADD TO CART
+                </button>
+            ) : (
+                <button
+                    className="card-button disabled"
+                    onClick={() => {
+                        message.error("Item Not Available :(");
+                    }}
+                >
+                    ADD TO CART
+                </button>
+            )}
         </div>
     );
 }
